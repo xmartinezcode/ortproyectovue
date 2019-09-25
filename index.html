@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Quorum</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+        #map {
+            height: 50%;
+            width: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                    <h1>Crear Evento</h1>
+                    <label>Tipo</label>
+                    <img v-bind:src="'img/'+tipo+'.png'" width="50px" height="50px"></img>
+                    </br>
+                    </br>
+                    <select class="form-control" v-model="tipo" id="tipo">
+                        <option>Partido Futbol</option>
+                        <option>Cartas Magic</option>
+                        <option>Mateada en la Plaza</option>
+                    </select>
+
+                    <label>Direccion</label>
+
+
+
+                    <input type="text" class="form-control" id="autocomplete" v-model="direccion" />
+
+
+
+                    </br>
+                    <input type="button" value="Crear" class="btn btn-success" v-on:click="agregarEvento">
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <h1 v-if="lista.length > 0">Lista de Eventos</h1>
+                    <h1 v-else="lista">No existen Eventos</h1>
+                    <table class="table">
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Direccion</th>
+                            <th></th>
+                        </tr>
+                        <tr v-for="item in lista" v-bind:style="item.tipo==false?'color:red':''">
+                            <td v-text="item.tipo"></td>
+                            <td v-text="item.direccion"></td>
+                            <td><img v-bind:src="'img/'+item.tipo+'.png'" width="30px" height="30px"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+    <br>
+
+    <div class="container" id="map"></div>
+
+    <script>
+        function initialize() {
+
+            initAutocomplete();
+            initMap();
+
+        }
+        var map, marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: -34.5970923,
+                    lng: -58.4409074
+                },
+                zoom: 13
+            });
+
+
+            if (app.lista == undefined) {
+
+                location.reload();
+
+            } else {
+                app.lista.forEach(eventos => {
+                    var infowindow = new google.maps.InfoWindow({
+                        content: eventos.tipo + " " + eventos.direccion
+                    });
+
+                    var myLatLng = { lat: eventos.latitud, lng: eventos.longitud };
+                    var marker = new google.maps.Marker({
+                        position: myLatLng,
+                        map: map,
+                        title: 'Hello World!',
+                        icon: "img/" + eventos.tipo + "icon.png",
+
+                    });
+
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                    });
+                });
+
+            }
+
+
+
+
+
+
+
+        }
+        // This example displays an address form, using the autocomplete feature
+        // of the Google Places API to help users fill in the information.
+
+        // This example requires the Places library. Include the libraries=places
+        // parameter when you first load the API. For example:
+        // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+        var autocomplete, placeSearch, place;
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            country: 'long_name',
+            postal_code: 'short_name'
+        };
+
+        function initAutocomplete() {
+            // Create the autocomplete object, restricting the search to geographical
+            // location types.
+            autocomplete = new google.maps.places.Autocomplete(
+                /** @type {!HTMLInputElement} */
+                (document.getElementById('autocomplete')), {
+                types: ['geocode'],
+                componentRestrictions: {
+                    country: "ARG"
+                }
+
+            });
+
+
+            // When the user selects an address from the dropdown, populate the address
+            // fields in the form.
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                var place = autocomplete.getPlace();
+
+                //   app.data.latitudvue = place.geometry.location.lat();
+                app.latitud = place.geometry.location.lat();
+                app.longitud = place.geometry.location.lng();
+
+
+            });
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+    </script>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhpgWurgQ_iwcZKqXCnD6x6Zma6ooi5Xw&signed_in=true&libraries=places&callback=initialize"
+        async defer></script>
+
+
+
+
+
+</body>
+
+
+
+<script src="js/vue.js"></script>
+<script src="js/principal.js"></script>
+
+</html>
